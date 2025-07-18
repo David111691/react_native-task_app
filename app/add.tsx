@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -25,6 +25,7 @@ import {
 } from "react-native-paper-dates";
 
 export default function AddTaskScreen() {
+  // Form fields state
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [location, setLocation] = useState("");
@@ -34,6 +35,7 @@ export default function AddTaskScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  // Snackbar state
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -41,9 +43,11 @@ export default function AddTaskScreen() {
 
   registerTranslation("en", enLocale);
 
+  // Save task to AsyncStorage
   const handleSave = async () => {
     if (isSaving) return;
 
+    // Validate input fields
     if (!title || !desc || !date || !location) {
       setSnackbarMessage("Please fill out all fields");
       setSnackbarVisible(true);
@@ -64,10 +68,9 @@ export default function AddTaskScreen() {
       setSnackbarMessage("saving");
       setSnackbarVisible(true);
       const current = await loadTasks();
-
       const updated = [...current, newTask];
       await saveTasks(updated);
-      router.back();
+      router.back(); // Navigate back to task list
     } catch (err) {
       setSnackbarMessage("Failed to save task.");
       setSnackbarVisible(true);
@@ -83,6 +86,7 @@ export default function AddTaskScreen() {
           <View style={GlobalStyles.ContentWrapper}>
             <Text style={styles.heading}>Add New Task</Text>
 
+            {/* Title input */}
             <TextInput
               placeholder="Title"
               placeholderTextColor={"#999"}
@@ -90,6 +94,8 @@ export default function AddTaskScreen() {
               value={title}
               onChangeText={setTitle}
             />
+
+            {/* Description input */}
             <TextInput
               placeholder="Description"
               placeholderTextColor={"#999"}
@@ -97,6 +103,8 @@ export default function AddTaskScreen() {
               value={desc}
               onChangeText={setDesc}
             />
+
+            {/* Date/time selector */}
             <TouchableOpacity
               style={styles.input}
               onPress={() => setShowDatePicker(true)}
@@ -105,6 +113,8 @@ export default function AddTaskScreen() {
                 {date ? formatDateTime(date) : "Select Date and Time"}
               </Text>
             </TouchableOpacity>
+
+            {/* Location input */}
             <TextInput
               placeholder="Location"
               placeholderTextColor={"#999"}
@@ -113,12 +123,14 @@ export default function AddTaskScreen() {
               onChangeText={setLocation}
             />
 
+            {/* Save button */}
             <TouchableOpacity style={styles.button} onPress={handleSave}>
               <Text style={styles.buttonText}>Save Task</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
 
+        {/* Date picker modal */}
         <DatePickerModal
           locale="en"
           mode="single"
@@ -130,11 +142,12 @@ export default function AddTaskScreen() {
             if (selectedDate) {
               const newDate = new Date(selectedDate);
               setTempDate(newDate);
-              setShowTimePicker(true);
+              setShowTimePicker(true); // Open time picker next
             }
           }}
         />
 
+        {/* Time picker modal */}
         <TimePickerModal
           visible={showTimePicker}
           onDismiss={() => setShowTimePicker(false)}
@@ -153,6 +166,7 @@ export default function AddTaskScreen() {
           label="Select time"
         />
 
+        {/* Snackbar feedback */}
         <Snackbar
           visible={snackbarVisible}
           onDismiss={() => setSnackbarVisible(false)}

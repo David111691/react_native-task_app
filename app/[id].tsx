@@ -1,6 +1,6 @@
 import formatDateTime from "@/utils/formatDate";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -14,9 +14,11 @@ import { Task } from "../types/Task";
 import { loadTasks, saveTasks } from "../utils/storage";
 
 export default function TaskDetailsScreen() {
+  // Get the task ID from route parameters
   const { id } = useLocalSearchParams<{ id: string }>();
   const [task, setTask] = useState<Task | null>(null);
 
+  // Load the task by ID when the screen mounts
   useEffect(() => {
     loadTasks().then((tasks) => {
       const found = tasks.find((t) => t.id === id);
@@ -24,6 +26,7 @@ export default function TaskDetailsScreen() {
     });
   }, [id]);
 
+  // Update task status and go back to the list
   const updateStatus = async (status: Task["status"]) => {
     const tasks = await loadTasks();
     const updated = tasks.map((t) => (t.id === id ? { ...t, status } : t));
@@ -31,6 +34,7 @@ export default function TaskDetailsScreen() {
     router.back();
   };
 
+  // Delete task and return to the list
   const handleDelete = async () => {
     const tasks = await loadTasks();
     const updated = tasks.filter((t) => t.id !== id);
@@ -38,12 +42,14 @@ export default function TaskDetailsScreen() {
     router.back();
   };
 
+  // If task not found yet, return null
   if (!task) return null;
 
   return (
     <SafeAreaView style={GlobalStyles.SafeAreaContainer}>
       <ScrollView>
         <View style={GlobalStyles.ContentWrapper}>
+          {/* Task details card */}
           <View style={styles.card}>
             <Text style={styles.title}>{task.title}</Text>
 
@@ -65,6 +71,7 @@ export default function TaskDetailsScreen() {
             <Text style={styles.status}>Status: {task.status}</Text>
           </View>
 
+          {/* Status update buttons */}
           <View style={styles.buttonGroup}>
             <TouchableOpacity
               style={styles.button}
@@ -84,6 +91,8 @@ export default function TaskDetailsScreen() {
             >
               <Text style={styles.buttonText}>Cancelled</Text>
             </TouchableOpacity>
+
+            {/* Delete button */}
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={handleDelete}
@@ -97,6 +106,7 @@ export default function TaskDetailsScreen() {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",

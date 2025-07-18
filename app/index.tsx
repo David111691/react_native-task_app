@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -23,6 +23,7 @@ export default function TaskListScreen() {
   const [sortByDateDesc, setSortByDateDesc] = useState(true);
   const [statusPriority, setStatusPriority] = useState<string | null>(null);
 
+  // Load tasks when screen is focused
   useFocusEffect(
     useCallback(() => {
       setIsLoading(true);
@@ -32,12 +33,14 @@ export default function TaskListScreen() {
     }, [])
   );
 
+  // Delete a task by its ID and save the updated list
   const deleteTask = async (id: string) => {
     const updated = tasks.filter((t) => t.id !== id);
     setTasks(updated);
     await saveTasks(updated);
   };
 
+  // Sort tasks by status priority or by date
   function getSortedTasks(): Task[] {
     let sorted = [...tasks];
 
@@ -60,8 +63,8 @@ export default function TaskListScreen() {
 
     if (statusPriority) return sorted;
 
+    // Sort by date if no status is selected
     sorted.sort((a, b) => {
-      console.log(a, b);
       const dateA = a.date.getTime();
       const dateB = b.date.getTime();
       return sortByDateDesc ? dateB - dateA : dateA - dateB;
@@ -81,6 +84,7 @@ export default function TaskListScreen() {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <>
+            {/* Top heading and Add Task button */}
             <View style={styles.header}>
               <Text style={styles.heading}>My Tasks</Text>
               <View style={styles.button}>
@@ -88,7 +92,9 @@ export default function TaskListScreen() {
               </View>
             </View>
 
+            {/* Sorting controls (date and status) */}
             <View style={styles.sortingComponent}>
+              {/* Sort by date elements */}
               <View style={styles.button}>
                 <Button
                   title={`Sort by Date: ${
@@ -102,6 +108,7 @@ export default function TaskListScreen() {
                 />
               </View>
 
+              {/* Sort by status elements */}
               <Text style={styles.textLabel}>Sort by Status:</Text>
               <View
                 style={{
@@ -131,13 +138,15 @@ export default function TaskListScreen() {
             </View>
           </>
         }
+        // Render each task using TaskItem component
         renderItem={({ item }) => (
           <TaskItem
             task={item}
             onDelete={deleteTask}
-            onPress={() => router.push(`/${item.id}`)}
+            onPress={() => router.push(`/${item.id}`)} // Navigate to task detail
           />
         )}
+        // Show spinner or message if no tasks
         ListEmptyComponent={
           isLoading ? (
             <ActivityIndicator
@@ -154,6 +163,7 @@ export default function TaskListScreen() {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   header: {
     paddingBottom: 24,

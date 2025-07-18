@@ -1,5 +1,4 @@
 import formatDateTime from "@/utils/formatDate";
-import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Task } from "../types/Task";
 
@@ -10,6 +9,7 @@ type Props = {
 };
 
 export default function TaskItem({ task, onDelete, onPress }: Props) {
+  // Returns a color based on the task status
   function getStatusColor(status: string): string {
     const normalizedStatus = status.replace(/\s+/g, "").toLowerCase();
 
@@ -28,17 +28,24 @@ export default function TaskItem({ task, onDelete, onPress }: Props) {
   }
 
   return (
+    // Main container for the task item
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View>
+        {/* Task title*/}
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
           {task.title}
         </Text>
+
+        {/* Formatted date */}
         <Text>{formatDateTime(task.date)}</Text>
+
+        {/* status label */}
         <Text style={{ color: getStatusColor(task.status), fontWeight: "500" }}>
           Status: {task.status}
         </Text>
       </View>
 
+      {/* Delete button*/}
       <TouchableOpacity
         style={styles.deleteButton}
         onPress={() => onDelete(task.id)}
@@ -49,6 +56,7 @@ export default function TaskItem({ task, onDelete, onPress }: Props) {
   );
 }
 
+// Styles for the task item
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
